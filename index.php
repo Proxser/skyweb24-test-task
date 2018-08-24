@@ -46,7 +46,7 @@
 					<thead class="thead-light">
 						<tr>
 							<th class="bg-dark"><h4 class="text-white"><</h4></th>
-							<th class="bg-dark" colspan="5"><h4 class="text-white">Август 2018</h4></th>
+							<th class="bg-dark month-name" colspan="5"><h4 class="text-white">Август 2018</h4></th>
 							<th class="bg-dark"><h4 class="text-white">></h4></th>
 						</tr>
 						<tr>
