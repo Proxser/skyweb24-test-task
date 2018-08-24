@@ -1,33 +1,91 @@
-function getLastDayOfMonth(year, month) {
-	var date = new Date(year, month + 1, 0);
-	return date.getDate();
+﻿
+// Функция для получения кол-ва дней в заданном месяце (1-31)
+function getCountDayOfMonth(year, month) {
+	var D = new Date(year, month + 1, 0);
+	return D.getDate();
 }
 
-function getNameLastDayOfMonth(year, month) {
-	var date = new Date(year, month, getLastDayOfMonth(year, month));
-	return date.getDay();
+// Функция для получения номера дня недели первого дня заданного месяца
+function getNumFirstDayOfMonth(year, month) {
+	var D = new Date(year, month, 1);
+	return D.getDay();
 }
 
-function getNameFirstDayOfMonth(year, month) {
-	var date = new Date(year, month, 1);
-	return date.getDay();
+// Функция для получения номера дня недели последнего заданного месяца
+function getNumLastDayOfMonth(year, month) {
+	var D = new Date(year, month, getCountDayOfMonth(year, month));
+	return D.getDay();
 }
 
+// Получаем календарь
 function getCalendar() {
-	var date = new Date(),
-		lastDayOfMonth = getLastDayOfMonth(date.getFullYear(), date.getMonth()),
-		nameLastDayOfMonth = getNameLastDayOfMonth(date.getFullYear(), date.getMonth()),
-		nameFirstDayOfMonth = getNameFirstDayOfMonth(date.getFullYear(), date.getMonth()),
+	var D = new Date(/*2018, 6, 1*/);
+		// Получаем текущую дату
+		countDayOfMonth 	= getCountDayOfMonth(D.getFullYear(), D.getMonth()),
+		// Получаем кол-во дней в месяце
+		countDayOfPrevMonth = getCountDayOfMonth(D.getFullYear(), D.getMonth() - 1),
+		// Получаем кол-во дней в предыдущем месяце
+		numFirstDayOfMonth 	= getNumFirstDayOfMonth(D.getFullYear(), D.getMonth()),
+		// Получаем номер дня недели первого дня месяца
+		numLastDayOfMonth 	= getNumLastDayOfMonth(D.getFullYear(), D.getMonth()),
+		// Получаем номер дня недели последнего дня месяца
+
 		namesOfMonths = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
-		calendar = undefined;
+		calendar = '<tr>';
 
-		console.log(date);
-		console.log(lastDayOfMonth);
-		console.log(nameLastDayOfMonth);
-		console.log(nameFirstDayOfMonth);
+		console.log(D);
+		console.log(countDayOfMonth);
+		console.log(countDayOfPrevMonth);
+		console.log(numFirstDayOfMonth);
+		console.log(numLastDayOfMonth);
 
-	// document.querySelector('#calendar1 tbody').innerHTML = calendar;
+		// Распечатываем дни предыдущего месяца
+
+		if (numFirstDayOfMonth != 0) {
+			// Если 1-й день текущего месяца не воскресенье, то распечатываем
+			// дни предыдущего месяца до первого дня текущего
+			countDayOfPrevMonth -= numFirstDayOfMonth - 1;
+			for (var i = 1; i < numFirstDayOfMonth; i++) {
+				countDayOfPrevMonth++;
+				calendar += '<td class="text-muted">' + countDayOfPrevMonth + '</td>';
+			}
+		} else {
+			countDayOfPrevMonth -= 6;
+			for (var i = 0; i < 6; i++) {
+				countDayOfPrevMonth++;
+				calendar += '<td class="text-muted">' + countDayOfPrevMonth + '</td>';
+			}
+		}
+
+		// Распечатываем дни текущего месяца
+
+		for (var  i = 1; i <= countDayOfMonth; i++) {
+
+			if (i != D.getDate()) {
+				calendar += '<td>' + i + '</td>';
+			} else {
+				calendar += '<td id="today">' + i + '</td>';  // сегодняшней дате можно задать стиль CSS
+			}
+
+			if (new Date(D.getFullYear(), D.getMonth(), i).getDay() == 0) {  // если день выпадает на воскресенье, то перевод строки
+		    	calendar += '</tr><tr>';
+			}
+		}
+
+		// Распечатываем дни след. месяца
+
+		if (numLastDayOfMonth != 0) {
+			for(var  i = numLastDayOfMonth, j = 1; i < 7; i++) {
+				calendar += '<td class="text-muted">' + j++ + '</td>';
+			}
+		}
+
+		calendar += '</tr>';
+
+		console.log(calendar);
 }
+
+getCalendar();
 
 // var D1 = new Date(),
 //     D1last = new Date(D1.getFullYear(),D1.getMonth()+1,0).getDate(), // последний день месяца
