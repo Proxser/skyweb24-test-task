@@ -127,11 +127,11 @@
 
 				<!-- Подсказки -->
 
-				<div class="alert alert-success" role="alert">
+				<div class="alert alert-success bg-success text-white" role="alert">
 					Зелёным цветом помечаются выбранные вами дни
 				</div>
 
-				<div class="alert alert-danger" role="alert">
+				<div class="alert alert-danger bg-danger text-white" role="alert">
 					Красным цветом помечены уже забронированные дни
 				</div>
 
