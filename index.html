@@ -12,6 +12,7 @@
 
 	<!-- Свои стили -->
 
+	<link rel="stylesheet" type="text/css" href="css/fontawesome.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
 
 	<!-- Заголовок страницы -->
@@ -39,15 +40,25 @@
 			<!-- Отображение календаря -->
 
 			<div class="col-md-6">
-				<table id="calendar" class="table table-bordered text-center">
+				<table id="calendar" class="table table-bordered rounded text-center">
 
 					<!-- Заголовки таблицы -->
 
 					<thead class="thead-light">
 						<tr>
-							<th class="bg-dark"><h4 class="text-white"><</h4></th>
-							<th class="bg-dark" colspan="5"><h4 class="text-white">Август 2018</h4></th>
-							<th class="bg-dark"><h4 class="text-white">></h4></th>
+							<th id="prevMonth" class="bg-dark">
+								<button type="button" class="btn btn-outline-secondary btn-sm">
+									<i class="fa fa-angle-left text-white"></i>
+								</button>
+							</th>
+							<th id="month-name" class="bg-dark" colspan="5">
+								<!-- <h5 class="text-white">Август 2018</h5> -->
+							</th>
+							<th id="nextMonth" class="bg-dark">
+								<button type="button" class="btn btn-outline-secondary btn-sm">
+									<i class="fa fa-angle-right text-white"></i>
+								</button>
+							</th>
 						</tr>
 						<tr>
 				      		<th scope="col">Пн</th>
@@ -133,6 +144,14 @@
 
 				<div class="alert alert-danger bg-danger text-white" role="alert">
 					Красным цветом помечены уже забронированные дни
+				</div>
+
+				<div class="alert alert-info bg-info text-white" role="alert">
+					Синим цветом помечан сегодняшний день
+				</div>
+
+				<div class="alert alert-light bg-light" role="alert">
+					Серым цветом помечаны дни предыдущего и следующего месяца
 				</div>
 
 				<!-- Небольшой текст со справкой -->
