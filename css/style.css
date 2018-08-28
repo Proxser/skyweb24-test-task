@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto');
+﻿@import url('https://fonts.googleapis.com/css?family=Roboto');
 
 body {
 	font-family: 'Roboto', sans-serif;
@@ -6,4 +6,5 @@ body {
 
 .clickable:hover {
 	background: #6c757d;
+	color: white;
 }

@@ -1,20 +1,23 @@
-﻿var Calendar = function () {
+﻿// Определяем коструктор класса "Calendar"
+var Calendar = function (id) {
 
 	this.date = new Date();
 	// Текущая дата
+	this.dateCache = this.date;
 	this.url = 'http://skyweb24.loc/data.php';
 	// URL php-сценария, который отдаёт и принимает забронированные дни
-	this.bookedDays = this.getBookedDays(this.url);
+	this.calendarId = id,
+	this.bookedDays = [];
 	// Забронированные дни
 	this.selectedDays = [];
 	// Выбранные дни
-	this.countDayOfMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
+	this.countDayOfMonth = '',
 	// Получаем кол-во дней в месяце (1-31)
-	this.countDayOfPrevMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth() - 1),
+	this.countDayOfPrevMonth = '',
 	// Получаем кол-во дней в предыдущем месяце (1-31)
-	this.numFirstDayOfMonth = this.getNumFirstDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
+	this.numFirstDayOfMonth = '',
 	// Получаем номер дня недели первого дня месяца (0-6)
-	this.numLastDayOfMonth = this.getNumLastDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
+	this.numLastDayOfMonth = '',
 	// Получаем номер дня недели последнего дня месяца (0-6)
 	this.namesOfMonths = ["Январь", "Февраль", "Март", "Апрель", "Май",
 						  "Июнь", "Июль", "Август", "Сентябрь",
@@ -65,26 +68,21 @@ Calendar.prototype.getNumLastDayOfMonth = function (year, month) {
 Calendar.prototype.getDaysOfPrevMonth = function () {
 	// Если 1-й день месяца - не воскресенье, то заполняем 1-ю строку календаря 
 	// днями прошлого месяца до N-ой (Пн-Вс или 0-6) позиции в неделе
-	if (this.numFirstDayOfMonth != 0)
-	{
+	if (this.numFirstDayOfMonth != 0) {
 		// Если 1-й день месяца - понедельник, то первую строку календаря полностью
 		// (7 ячеек) заполняем днями прошлого месяца
-		if (this.numFirstDayOfMonth == 1)
-		{
+		if (this.numFirstDayOfMonth == 1) {
 			this.countDayOfPrevMonth -= 7;
-			for (var i = 0; i < 7; i++)
-			{
+			for (var i = 0; i < 7; i++) {
 				this.countDayOfPrevMonth++;
 				this.calendar += '<td class="bg-light text-muted">' + this.countDayOfPrevMonth + '</td>';
 				this.counter--;
 			}
 			this.calendar += '</tr><tr>';
 		}
-		else
-		{
+		else {
 			this.countDayOfPrevMonth -= this.numFirstDayOfMonth - 1;
-			for (var i = 1; i < this.numFirstDayOfMonth; i++)
-			{
+			for (var i = 1; i < this.numFirstDayOfMonth; i++) {
 				this.countDayOfPrevMonth++;
 				this.calendar += '<td class="bg-light text-muted">' + this.countDayOfPrevMonth + '</td>';
 				this.counter--;
@@ -93,11 +91,9 @@ Calendar.prototype.getDaysOfPrevMonth = function () {
 	}
 	// Если 1-й день месяца - воскресенье, то в 1-й строке календаря будет
 	// 6 дней прошлого месяца
-	else
-	{
+	else {
 		this.countDayOfPrevMonth -= 6;
-		for (var i = 0; i < 6; i++)
-		{
+		for (var i = 0; i < 6; i++) {
 			this.countDayOfPrevMonth++;
 			this.calendar += '<td class="bg-light text-muted">' + this.countDayOfPrevMonth + '</td>';
 			this.counter--;
@@ -107,32 +103,25 @@ Calendar.prototype.getDaysOfPrevMonth = function () {
 
 // Функция для получения дней текущего месяца 
 Calendar.prototype.getDaysOfCurrentMonth = function () {
-	for (var  i = 1; i <= this.countDayOfMonth; i++)
-	{
+	for (var  i = 1; i <= this.countDayOfMonth; i++) {
 		// Если i-ый день в цикле не сегодняшний, задаём ему соответствующий 
 		// стиль и характеристику "забронированного" или "свободного" дня,
 		// согласно ТЗ, иначе, если день сегодняшний и свободен, то задаём ему
 		// немного иной стиль
-		if (i != this.date.getDate())
-		{
-			if (this.bookedDays.indexOf(i) != -1)
-			{
+		if (i != this.date.getDate()) {
+			if (this.bookedDays.indexOf(i) != -1) {
 				this.calendar += '<td class="bg-danger text-white" title="Данный день занят" data-toggle="tooltip" data-placement="bottom">' + i + '</td>';
 			}
-			else
-			{
+			else {
 				this.calendar += '<td class="clickable" title="Данный день свободен" data-toggle="tooltip" data-placement="bottom">' + i + '</td>';
 			}
 			this.counter--;
 		}
-		else
-		{
-			if (this.bookedDays.indexOf(i) != -1)
-			{
+		else {
+			if (this.bookedDays.indexOf(i) != -1) {
 				this.calendar += '<td id="today" class="bg-danger text-white" title="Сегодняшний день занят" data-toggle="tooltip" data-placement="bottom">' + i + '</td>';
 			}
-			else
-			{
+			else {
 				this.calendar += '<td id="today" class="bg-info text-white clickable" title="Сегодняшний день свободен" data-toggle="tooltip" data-placement="bottom">' + i + '</td>';
 			}
 			this.counter--;
@@ -140,9 +129,7 @@ Calendar.prototype.getDaysOfCurrentMonth = function () {
 
 		// Если день выпадает на воскресенье, то делаем перевод строки,
 		// закрывая предыдущую строку таблицы и открывая новую
-		if (new Date(this.date.getFullYear(), this.date.getMonth(), i).getDay() == 0)
-		{
-		
+		if (new Date(this.date.getFullYear(), this.date.getMonth(), i).getDay() == 0) {
 	    	this.calendar += '</tr><tr>';
 		}
 	}
@@ -150,12 +137,10 @@ Calendar.prototype.getDaysOfCurrentMonth = function () {
 
 // Функция для получения дней следующего месяца 
 Calendar.prototype.getDaysOfNextMonth = function () {
-	for (var j = 0; this.counter; this.counter--)
-	{
+	for (var j = 0; 0 < this.counter; this.counter--) {
 		this.calendar += '<td class="bg-light text-muted">' + ++j + '</td>';
 		// Если день - воскресенье, то делаем перевод строки
-		if (new Date(this.date.getFullYear(), this.date.getMonth() + 1, j).getDay() == 0)
-		{
+		if (new Date(this.date.getFullYear(), this.date.getMonth() + 1, j).getDay() == 0) {
 			this.calendar += '<tr>';
 		}
 	}
@@ -164,24 +149,21 @@ Calendar.prototype.getDaysOfNextMonth = function () {
 // Функция для получения тела календаря (tbody)
 Calendar.prototype.getBodyOfCalendar = function () {
 
-	this.calendar += '<tr>';
+	this.countDayOfMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
+	this.countDayOfPrevMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth() - 1),
+	this.numFirstDayOfMonth = this.getNumFirstDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
+	this.numLastDayOfMonth = this.getNumLastDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
+	this.bookedDays = (this.date == this.dateCache) ? this.getBookedDays(this.url) : [];
+	this.calendar = '<tr>';
+	this.counter = 42;
 
-	// -------------------------------------------------------------------------
 	// Создаем ячейки с днями предыдущего месяца
-	// -------------------------------------------------------------------------
-
 	this.getDaysOfPrevMonth();
 
-	// -------------------------------------------------------------------------
 	// Создаём ячейки с днями текущего месяца
-	// -------------------------------------------------------------------------
-
 	this.getDaysOfCurrentMonth();
 
-	// -------------------------------------------------------------------------
 	// Создаём ячейки с днями следующего месяца
-	// -------------------------------------------------------------------------
-
 	this.getDaysOfNextMonth();
 
 	this.calendar += '</tr>';
@@ -199,7 +181,8 @@ Calendar.prototype.addClickable = function () {
 		// Если данный элемент является сегодняшним днем
 		if ( 'today' == $(this).attr('id') ) {
 			$(this).toggleClass('bg-success bg-info');
-		} else {
+		}
+		else {
 			$(this).toggleClass('bg-success text-white');
 		}
 
@@ -211,7 +194,8 @@ Calendar.prototype.addClickable = function () {
 			selectedDays.push( +$(this).text() );
 			console.log(selectedDays);
 			$(this).data('click', true);
-		} else {
+		}
+		else {
 			selectedDays.splice( selectedDays.indexOf( $(this).text() ), 1);
 			console.log(selectedDays);
 			$(this).data('click', false);
@@ -220,7 +204,8 @@ Calendar.prototype.addClickable = function () {
 		// Если есть выбранный элемент, то делаем кнопку кликабельной
 		if (selectedDays.length > 0) {
 			$('#bookedButton').removeAttr('disabled').text('Забронировать');
-		} else {
+		}
+		else {
 			$('#bookedButton').attr('disabled', true);
 		}
 
@@ -234,7 +219,7 @@ Calendar.prototype.clickOnBookedButton = function() {
 		selectedDays = this.selectedDays,
 		url = this.url;
 
-	$('#bookedButton').click(function() {
+	$('#bookedButton').click(function(event) {
 		
 		console.log(selectedDays);
 		// Объединяем массивы выбранных и ранее забронированных дней
@@ -248,11 +233,9 @@ Calendar.prototype.clickOnBookedButton = function() {
 			attr('data-original-title', 'Данный день занят').
 			toggleClass('bg-success clicked').
 			addClass('bg-danger');
-		// Также убираем с них все события на клик
+		// Также убираем с них и со всех кликабельных элементах календаря
+		// события на клик
 		$('.clickable').unbind('click');
-
-		console.groupEnd();
-		console.group('Сортировка массива забронированнх дней и его отправка на сервер');
 
 		console.log(bookedDays);
 
@@ -281,7 +264,6 @@ Calendar.prototype.clickOnBookedButton = function() {
 			}
 		});
 
-		console.groupEnd();
 	});
 
 	this.bookedDays = bookedDays;
@@ -289,14 +271,14 @@ Calendar.prototype.clickOnBookedButton = function() {
 };
 
 // Функция получения календаря и его присваивания tbody таблицы с заданным id
-Calendar.prototype.getCalendar = function (id) {
+Calendar.prototype.getCalendar = function () {
 
 	// Получаем тело календаря
 	this.getBodyOfCalendar();
 
 	// Присваиваем его таблице с указанным "id", а также в заголовок таблице
 	// добавляем сведения о текущем месяце и годе
-	$('#' + id + ' tbody').html(this.calendar);
+	$('#' + this.calendarId + ' tbody').html(this.calendar);
 	$('#month-name').html(
 		'<h4 class="text-white">' +
 			this.namesOfMonths[this.date.getMonth()] + ' ' + this.date.getFullYear() +
@@ -307,28 +289,54 @@ Calendar.prototype.getCalendar = function (id) {
 	// Инициализируем все подсказки Bootstrap на странице
 	$('[data-toggle="tooltip"]').tooltip();
 
-	// Добавляем выделение элемента таблицы при наведении на него мыши
-	// $('.clickable').hover(
-	// 	function() {
-	// 	    $(this).toggleClass('bg-secondary');
-	// 	    if ( !$(this).hasClass('text-white') ) 
-	// 	    {
-	// 	    	$(this).toggleClass('text-white');
-	// 	    }
-	// 	    else
-	// 	    {
-	// 	    	$(this).removeClass('text-white');
-	// 	    }
-	// 	}
-	// );
-
-	console.group('Изменения массива с выбранными днями');
-
-	this.addClickable();
-
-	this.clickOnBookedButton();
+	if (this.date == this.dateCache) {
+		this.addClickable();
+		this.clickOnBookedButton()
+	};
 };
 
-var calendar = new Calendar();
+// Функция переключения календаря с текущего месяца на прошлый
+Calendar.prototype.prevMonth = function (year, month) {
+	
+	if (year == this.dateCache.getFullYear() && month == this.dateCache.getMonth() ) {
+		this.date = this.dateCache;
+		this.getCalendar();
+	}
+	else {
+		this.date = new Date( year, month, 1 );
+		this.getCalendar();
+		$('#bookedButton').attr('disabled', true);
+	}
+};
 
-calendar.getCalendar('calendar');
+// Функция переключения календаря с текущего месяца на следующий
+Calendar.prototype.nextMonth = function (year, month) {
+
+	if (year == this.dateCache.getFullYear() && month == this.dateCache.getMonth() ) {
+		this.date = this.dateCache;
+		this.getCalendar();
+	}
+	else {
+		this.date = new Date( year, month, 1 );
+		this.getCalendar();
+		$('#bookedButton').attr('disabled', true);
+	}
+};
+
+// Основная программа
+
+var calendar = new Calendar('calendar');
+
+calendar.getCalendar();
+
+// Добавление обработчиков событий для переключения месяцев календаря
+$('#prevMonth').click(
+	function (event) {
+		calendar.prevMonth( $('#month-name').data().year, $('#month-name').data().month - 1 )
+	}
+);
+$('#nextMonth').click(
+	function (event) {
+		calendar.nextMonth( $('#month-name').data().year, $('#month-name').data().month + 1 )
+	}
+);
