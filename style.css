@@ -3,3 +3,7 @@
 body {
 	font-family: 'Roboto', sans-serif;
 }
+
+.clickable:hover {
+	background: #6c757d;
+}
