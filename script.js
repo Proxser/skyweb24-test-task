@@ -1,6 +1,6 @@
-﻿var Calendar = function (date, url) {
-	this.date = date;
-	this.url = url;
+﻿var Calendar = function () {
+	this.date = new Date();
+	this.url = 'http://skyweb24.loc/data.php';
 	this.bookedDays = [];
 	// Забронированные дни
 	this.selectedDays = [];
@@ -17,7 +17,7 @@
 						  "Июнь", "Июль", "Август", "Сентябрь",
 						  "Октябрь", "Ноябрь", "Декабрь"],
 	// Массив с названиями месяцев для отображения надписи
-	this.calendar = '<tr>',
+	this.calendar = '',
 	// Переменная в которую в конце будет сформирован весь календарь
 	this.counter = 42;
 };
@@ -140,6 +140,8 @@ Calendar.prototype.getBodyOfCalendar = function () {
 
 	this.bookedDays = this.getBookedDays(this.url);
 
+	this.calendar += '<tr>';
+
 	// -------------------------------------------------------------------------
 	// Создаем ячейки с днями предыдущего месяца
 	// -------------------------------------------------------------------------
@@ -257,9 +259,19 @@ Calendar.prototype.getCalendar = function (id) {
 
 	$('[data-toggle="tooltip"]').tooltip();
 
-	$('.clickable').hover(function() {
-		$(this).toggleClass('bg-secondary text-white');
-	});
+	$('.clickable').hover(
+		function() {
+		    $(this).toggleClass('bg-secondary');
+		    if ( !$(this).hasClass('text-white') ) 
+		    {
+		    	$(this).toggleClass('text-white');
+		    }
+		    else
+		    {
+		    	$(this).removeClass('text-white');
+		    }
+		}
+	);
 
 	this.addClickable();
 
@@ -299,6 +311,6 @@ Calendar.prototype.getCalendar = function (id) {
 // 	});
 // };
 
-var calendar = new Calendar(new Date(), 'http://skyweb24.loc/data.php');
+var calendar = new Calendar();
 
 calendar.getCalendar('calendar');
