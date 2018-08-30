@@ -6,7 +6,7 @@ var Calendar = function (id) {
 	this.dateCache = this.date;
 	// Сохраняем текущую дату, т.к. в дальнейшем мы будем использовать и изменять
 	// "this.date", чтобы перелистывать календарные месяцы
-	this.url = 'http://skyweb24.loc/data.php';
+	this.url = '/data.php';
 	// URL php-сценария, который отдаёт и принимает забронированные дни
 	this.calendarId = id;
 	// идентификатор HTML-элемента страницы в котором будут происходить изменения
@@ -231,18 +231,6 @@ Calendar.prototype.clickOnBookedButton = function() {
 		console.log(selectedDays);
 		// Объединяем массивы выбранных и ранее забронированных дней
 		bookedDays = bookedDays.concat(selectedDays);
-		// Делаем кнопку не кликабельной
-		$(this).text('Бронирование успешно завершено');
-		$(this).attr('disabled', true);
-		// Делаем стиль всех выбранныех дней "забронированными" и убираем с них
-		// класс "clicked", чтобы на них не срабатывало событие "hover"
-		$('.bg-success.clickable').
-			attr('data-original-title', 'Данный день занят').
-			toggleClass('bg-success clicked').
-			addClass('bg-danger');
-		// Также убираем с них и со всех кликабельных элементах календаря
-		// события на клик
-		$('.clickable').unbind('click');
 
 		console.log(bookedDays);
 		// Отсортируем массив забронированных дней, который собираемся отправить
@@ -265,12 +253,26 @@ Calendar.prototype.clickOnBookedButton = function() {
 				console.info('Данные успешно отправлены на сервер', data);
 			},
 			fail: function (data) {
-				console.error('При отправке данных на сервер что-то пошло не так :/', data);
+				console.error('При отправке данных на сервер что-то пошло не так :(', data);
+				alert('При отправке данных на сервер что-то пошло не так :(');
 			},
 			complete: function (data) {
 				console.info('Данные отправлены на сервер (Ajax.complete)', data);
 			}
 		});
+
+		// Делаем кнопку не кликабельной
+		$(this).text('Бронирование успешно завершено');
+		$(this).attr('disabled', true);
+		// Делаем стиль всех выбранныех дней "забронированными" и убираем с них
+		// класс "clicked", чтобы на них не срабатывало событие "hover"
+		$('.bg-success.clickable').
+			attr('data-original-title', 'Данный день занят').
+			toggleClass('bg-success clicked').
+			addClass('bg-danger');
+		// Также убираем с них и со всех кликабельных элементах календаря
+		// события на клик
+		$('.clickable').unbind('click');
 
 	});
 
