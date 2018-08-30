@@ -155,13 +155,24 @@ Calendar.prototype.getDaysOfNextMonth = function () {
 // Функция для получения тела календаря (tbody)
 Calendar.prototype.getBodyOfCalendar = function () {
 
+	// Если месяц в "this.date" явл-ся текущим, то запрашиваем у сервера список
+	// забронированных дней, иначе присваиваем "this.bookedDays" пустой массив
+	if ( this.date.getFullYear() == this.dateCache.getFullYear() && this.date.getMonth() == this.dateCache.getMonth() ) {
+		this.bookedDays = this.getBookedDays(this.url);
+	}
+	else {
+		this.bookedDays = [];
+	}
+
+	// Задаем начальные значения переменных
 	this.countDayOfMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth());
 	this.countDayOfPrevMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth() - 1);
 	this.numFirstDayOfMonth = this.getNumFirstDayOfMonth(this.date.getFullYear(), this.date.getMonth());
 	this.numLastDayOfMonth = this.getNumLastDayOfMonth(this.date.getFullYear(), this.date.getMonth());
-	this.bookedDays = ((this.date.getFullYear() == this.dateCache.getFullYear() && this.date.getMonth() == this.dateCache.getMonth())) ? this.getBookedDays(this.url) : [];
 	this.calendar = '<tr>';
 	this.counter = 42;
+	// Обновляем counter для того чтобы скрипт корректно работал при смене текущего
+	// месяца календаря на след. или прошлый
 
 	// Создаем ячейки с днями предыдущего месяца
 	this.getDaysOfPrevMonth();
