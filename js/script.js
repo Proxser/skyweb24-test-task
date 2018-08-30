@@ -350,8 +350,6 @@ Calendar.prototype.nextMonth = function (year, month) {
 
 var calendar = new Calendar('calendar');
 
-// calendar.getCalendar();
-
 // Добавление обработчиков событий для переключения месяцев календаря
 $('#prevMonth').click(
 	function (event) {
