@@ -4,30 +4,36 @@ var Calendar = function (id) {
 	this.date = new Date();
 	// Текущая дата
 	this.dateCache = this.date;
+	// Сохраняем текущую дату, т.к. в дальнейшем мы будем использовать и изменять
+	// "this.date", чтобы перелистывать календарные месяцы
 	this.url = 'http://skyweb24.loc/data.php';
 	// URL php-сценария, который отдаёт и принимает забронированные дни
-	this.calendarId = id,
+	this.calendarId = id;
+	// идентификатор HTML-элемента страницы в котором будут происходить изменения
 	this.bookedDays = [];
 	// Забронированные дни
 	this.selectedDays = [];
 	// Выбранные дни
-	this.countDayOfMonth = '',
+	this.countDayOfMonth = '';
 	// Получаем кол-во дней в месяце (1-31)
-	this.countDayOfPrevMonth = '',
+	this.countDayOfPrevMonth = '';
 	// Получаем кол-во дней в предыдущем месяце (1-31)
-	this.numFirstDayOfMonth = '',
+	this.numFirstDayOfMonth = '';
 	// Получаем номер дня недели первого дня месяца (0-6)
-	this.numLastDayOfMonth = '',
+	this.numLastDayOfMonth = '';
 	// Получаем номер дня недели последнего дня месяца (0-6)
 	this.namesOfMonths = ["Январь", "Февраль", "Март", "Апрель", "Май",
 						  "Июнь", "Июль", "Август", "Сентябрь",
-						  "Октябрь", "Ноябрь", "Декабрь"],
+						  "Октябрь", "Ноябрь", "Декабрь"];
 	// Массив с названиями месяцев для отображения надписи
-	this.calendar = '',
+	this.calendar = '';
 	// Переменная в которую в конце будет сформирован весь календарь
 	this.counter = 42;
 	// Счётчик для того чтобы создать календарь форматом (7х6)
-
+	this.getCalendar();
+	// Получаем календарь на текущий месяц
+	this.clickOnBookedButton();
+	// Добавляем событие при клике на кнопку "Забронировать"
 };
 
 // Функция для отправления запроса сервер и получения массива забронированных дней
@@ -38,11 +44,11 @@ Calendar.prototype.getBookedDays = function (url) {
 		method: 'GET',
 		async: false,
 		dataType: 'json',
-		context: this.bookedDays,
 		success: function (data) {
 			bookedDays = data;
 		}
 	});
+
 	return bookedDays;
 };
 
@@ -149,11 +155,11 @@ Calendar.prototype.getDaysOfNextMonth = function () {
 // Функция для получения тела календаря (tbody)
 Calendar.prototype.getBodyOfCalendar = function () {
 
-	this.countDayOfMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
-	this.countDayOfPrevMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth() - 1),
-	this.numFirstDayOfMonth = this.getNumFirstDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
-	this.numLastDayOfMonth = this.getNumLastDayOfMonth(this.date.getFullYear(), this.date.getMonth()),
-	this.bookedDays = (this.date == this.dateCache) ? this.getBookedDays(this.url) : [];
+	this.countDayOfMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth());
+	this.countDayOfPrevMonth = this.getCountDayOfMonth(this.date.getFullYear(), this.date.getMonth() - 1);
+	this.numFirstDayOfMonth = this.getNumFirstDayOfMonth(this.date.getFullYear(), this.date.getMonth());
+	this.numLastDayOfMonth = this.getNumLastDayOfMonth(this.date.getFullYear(), this.date.getMonth());
+	this.bookedDays = ((this.date.getFullYear() == this.dateCache.getFullYear() && this.date.getMonth() == this.dateCache.getMonth())) ? this.getBookedDays(this.url) : [];
 	this.calendar = '<tr>';
 	this.counter = 42;
 
@@ -219,6 +225,7 @@ Calendar.prototype.clickOnBookedButton = function() {
 		selectedDays = this.selectedDays,
 		url = this.url;
 
+	// Задаём событие на клик по кнопке "Забронировать"
 	$('#bookedButton').click(function(event) {
 		
 		console.log(selectedDays);
@@ -238,7 +245,8 @@ Calendar.prototype.clickOnBookedButton = function() {
 		$('.clickable').unbind('click');
 
 		console.log(bookedDays);
-
+		// Отсортируем массив забронированных дней, который собираемся отправить
+		// на сервер POST-запросом
 		bookedDays.sort(function (a, b) {
 		  if (a > b) return 1;
 		  if (a < b) return -1;
@@ -289,16 +297,18 @@ Calendar.prototype.getCalendar = function () {
 	// Инициализируем все подсказки Bootstrap на странице
 	$('[data-toggle="tooltip"]').tooltip();
 
-	if (this.date == this.dateCache) {
+	// Если месяц в "this.date" равен текущему ("new Date()"), то добавляем
+	// календарю кликабельность и выделяем уже забронированные дни
+	if (this.date.getFullYear() == this.dateCache.getFullYear() && this.date.getMonth() == this.dateCache.getMonth()) {
 		this.addClickable();
-		this.clickOnBookedButton()
 	};
 };
 
 // Функция переключения календаря с текущего месяца на прошлый
 Calendar.prototype.prevMonth = function (year, month) {
 	
-	if (year == this.dateCache.getFullYear() && month == this.dateCache.getMonth() ) {
+	if ( month == this.dateCache.getMonth() &&
+		 year == this.dateCache.getFullYear() ) {
 		this.date = this.dateCache;
 		this.getCalendar();
 	}
@@ -312,7 +322,7 @@ Calendar.prototype.prevMonth = function (year, month) {
 // Функция переключения календаря с текущего месяца на следующий
 Calendar.prototype.nextMonth = function (year, month) {
 
-	if (year == this.dateCache.getFullYear() && month == this.dateCache.getMonth() ) {
+	if ( year == this.dateCache.getFullYear() && month == this.dateCache.getMonth() ) {
 		this.date = this.dateCache;
 		this.getCalendar();
 	}
@@ -327,7 +337,7 @@ Calendar.prototype.nextMonth = function (year, month) {
 
 var calendar = new Calendar('calendar');
 
-calendar.getCalendar();
+// calendar.getCalendar();
 
 // Добавление обработчиков событий для переключения месяцев календаря
 $('#prevMonth').click(
