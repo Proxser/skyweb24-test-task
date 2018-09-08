@@ -217,7 +217,7 @@ Calendar.prototype.addClickable = function () {
 			$(this).data('click', true);
 		}
 		else {
-			selectedDays.splice( selectedDays.indexOf( $(this).text() ), 1);
+			selectedDays.splice( selectedDays.indexOf( +$(this).text() ), 1);
 			console.log(selectedDays);
 			$(this).data('click', false);
 		}
