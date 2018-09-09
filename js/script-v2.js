@@ -174,10 +174,10 @@ function getCalendar(date, id) {
 	console.log('Список забронированных дней: ', bookedDays);
 	console.groupEnd();
 
-	if ( date.getFullYear() == new Date().getFullYear() && date.getMonth() == new Date().getMonth() ) {
+	if ( date.getFullYear() == new Date().getFullYear()
+		&& date.getMonth() == new Date().getMonth()
+		&& $('input[name="bookedDays"]').val() !== '') {
 		bookedDays = JSON.parse( $('input[name="bookedDays"]').val() );
-	} else {
-		bookedDays = [];
 	}
 
 	console.group('Генерация календаря по указанному в \'date\' месяцу: ', namesOfMonths[date.getMonth()], date.getFullYear());
